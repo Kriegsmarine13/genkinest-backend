@@ -10,6 +10,10 @@ app.get('/', (req, res) => {
     res.json({"test": 'Hello World!'})
 })
 
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+});
+
 app.get('/api/login', (req, res) => {
     let data = {"email":"vladimir.backend@gmail.com","password":"Password123","fingerprint":"69adc8446318cabc826d9b66748c1929"}
     axios.post("https://nbc-ud20j1ht4hbq37lip3g73o12.an.r.appspot.com/login", data)
