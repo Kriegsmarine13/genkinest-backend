@@ -1,3 +1,4 @@
+runtime: nodejs20
 readiness_check:
   path: "/health"
   check_interval_sec: 60
