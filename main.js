@@ -7,7 +7,7 @@ const port = 80
 app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
-    res.send('Hello World!')
+    res.json({"test": 'Hello World!'})
 })
 
 app.get('/api/login', (req, res) => {
@@ -18,7 +18,7 @@ app.get('/api/login', (req, res) => {
             res.set(response.headers)
             // res.cookie("accessToken", response.data.accessToken)
 
-            res.send("success")
+            res.json({"status": "success"})
         }).catch((err) => {
             console.error(err)
     })
