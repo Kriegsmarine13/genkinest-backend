@@ -3,6 +3,11 @@ const bodyParser = require('body-parser')
 const axios = require("axios")
 const app = express()
 const port = process.env.PORT || 8080
+const userModel = require("./src/schemas/user/user")
+const db = require("./src/db/db")
+const mongoose = require("mongoose");
+
+db.connect();
 
 app.set('trust proxy', true);
 app.use(bodyParser.json())
@@ -29,6 +34,22 @@ app.get('/api/login', (req, res) => {
     })
 })
 
+app.get('/api/users', (req,res) => {
+    userModel.getUsers().then(
+        (result) => res.json(result)
+    ).catch((err) => console.log("Err: " + err))
+})
+
+app.post('/api/user', (req, res) => {
+    userModel.newUser(req.body).then(
+        () => res.send("done")
+    ).catch((err) => console.log("Err? " + err))
+})
+
+
+mongoose.connection.once("open", () => {
+    console.log("Connected to MongoDB")
+})
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
