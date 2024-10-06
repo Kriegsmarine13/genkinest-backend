@@ -26,7 +26,7 @@ const userSchema = new Schema({
     provider: String,
     providerId: String,
     reviewStats: Object,
-    typeId: String
+    typeId: String,
 })
 
 module.exports = { userSchema }
