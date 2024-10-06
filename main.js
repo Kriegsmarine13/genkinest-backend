@@ -15,12 +15,16 @@ app.set('trust proxy', true);
 app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
-    res.json({"test": 'Hello World!'})
+    res.status(200).json({"test": 'Hello World!'})
 })
 
 app.get('/health', (req, res) => {
     res.status(200).send('OK');
 });
+
+app.get('/_ah/start', (req, res) => {
+    res.status(200).json({"hello": "world"});
+})
 
 const isAuthenticated = async (req,res,next) => {
     // console.log("isAuth fired")
