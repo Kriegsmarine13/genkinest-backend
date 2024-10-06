@@ -9,6 +9,9 @@ const db = require("./src/db/db")
 const mongoose = require("mongoose");
 const authCheck = require("./src/middleware/authCheck")
 
+const http = require("http")
+const { Server } = require("socket.io")
+
 db.connect();
 
 app.set('trust proxy', true);
@@ -123,6 +126,45 @@ app.route('/api/organization/:id')
 mongoose.connection.once("open", () => {
     console.log("Connected to MongoDB")
 })
-app.listen(port, () => {
+
+const httpServer = http.createServer(app);
+httpServer.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
+})
+
+const io = new Server(httpServer, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    },
+    path: '/socket.io/'
+})
+
+const users = []
+io.on('connection', (socket) => {
+    console.log("New WebSocket connection ");
+    socket.on("adduser", username => {
+        socket.user = username;
+        users.push(username);
+        io.sockets.emit("users", users);
+
+        io.to(socket.id).emit("private", {
+            id: socket.id,
+            name: socket.user,
+            msg: "secret message",
+        });
+    });
+
+    socket.on('message', (message) => {
+        console.log(`Received message: ${message}`);
+        socket.emit('message', {
+            message,
+            user: socket.user,
+            id: socket.id,
+        });
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Client disconnected');
+    })
 })
