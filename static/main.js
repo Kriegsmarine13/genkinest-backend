@@ -2,7 +2,7 @@ const messageform = document.querySelector(".chatbox form");
 const messageList = document.querySelector("#messagelist");
 const userList = document.querySelector("ul#users");
 const chatboxinput = document.querySelector(".chatbox input");
-const socket = io("http://localhost:8081");
+const socket = io("https://gateway-dot-nbc-ud20j1ht4hbq37lip3g73o12.an.r.appspot.com:8081");
 
 let users = [];
 let messages = [];
@@ -38,7 +38,7 @@ function updateUsers() {
 function updateMessages() {
     messageList.textContent = "";
     for (let i = 0; i < messages.length; i++) {
-        const show = isUser === messages[i].user ? true : false;
+        const show = isUser === messages[i].user;
         messageList.innerHTML += `<li class=${show ? "private" : ""}>
                      <p>${messages[i].user}</p>
                      <p>${messages[i].message}</p>

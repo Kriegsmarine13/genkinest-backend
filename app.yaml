@@ -1,4 +1,7 @@
 runtime: nodejs20
+env: flex
+network:
+  session_affinity: true
 readiness_check:
   path: "/health"
   check_interval_sec: 60
