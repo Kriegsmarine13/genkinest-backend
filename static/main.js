@@ -2,7 +2,7 @@ const messageform = document.querySelector(".chatbox form");
 const messageList = document.querySelector("#messagelist");
 const userList = document.querySelector("ul#users");
 const chatboxinput = document.querySelector(".chatbox input");
-const socket = io("https://gateway-dot-nbc-ud20j1ht4hbq37lip3g73o12.an.r.appspot.com:8081");
+const socket = io("localhost:8081");
 
 let users = [];
 let messages = [];
@@ -22,6 +22,10 @@ socket.on("users", function (_users) {
     users = _users;
     updateUsers();
 });
+
+socket.on("connect_error", (err) => {
+    console.log(err)
+})
 
 messageform.addEventListener("submit", messageSubmitHandler);
 
