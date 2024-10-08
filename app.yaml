@@ -1,5 +1,4 @@
 runtime: nodejs20
-env: flex
 network:
   session_affinity: true
 readiness_check:

@@ -17,6 +17,7 @@ db.connect();
 app.set('trust proxy', true);
 app.use(bodyParser.json())
 
+// DUMB TERRITORY
 app.get('/', (req, res) => {
     res.status(200).json({"test": 'Hello World!'})
 })
@@ -25,8 +26,15 @@ app.get('/health', (req, res) => {
     res.status(200).send('OK');
 });
 
+// <- GIGA IMPORTANT ->
 app.get('/_ah/start', (req, res) => {
     res.status(200).json({"hello": "world"});
+})
+// <- GIGA IMPORTANT -/>
+
+app.use(express.static("./static"))
+app.get("/test-chat", (req, res) => {
+    res.sendFile("./static/index.html", {root: __dirname})
 })
 
 const isAuthenticated = async (req,res,next) => {
@@ -157,7 +165,7 @@ io.on('connection', (socket) => {
 
     socket.on('message', (message) => {
         console.log(`Received message: ${message}`);
-        socket.emit('message', {
+        io.sockets.emit('message', {
             message,
             user: socket.user,
             id: socket.id,
