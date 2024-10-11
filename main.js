@@ -8,6 +8,7 @@ const organizationModel = require("./src/models/organization")
 const db = require("./src/db/db")
 const mongoose = require("mongoose");
 const authCheck = require("./src/middleware/authCheck")
+const cors = require("cors")
 
 const http = require("http")
 const { Server } = require("socket.io")
@@ -16,6 +17,7 @@ db.connect();
 
 app.set('trust proxy', true);
 app.use(bodyParser.json())
+app.use(cors())
 
 // DUMB TERRITORY
 app.get('/', (req, res) => {
@@ -136,9 +138,6 @@ mongoose.connection.once("open", () => {
 })
 
 const httpServer = http.createServer(app);
-httpServer.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
 
 const io = new Server(httpServer, {
     cors: {
@@ -175,4 +174,9 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('Client disconnected');
     })
+})
+
+
+httpServer.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
 })
