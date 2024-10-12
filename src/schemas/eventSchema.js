@@ -25,3 +25,5 @@ const eventSchema = new Schema({
     startDate: Date,
     endDate: Date,
 })
+
+module.exports = { eventSchema }

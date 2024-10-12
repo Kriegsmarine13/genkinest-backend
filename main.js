@@ -5,6 +5,7 @@ const app = express()
 const port = process.env.PORT || 8080
 const userModel = require("./src/models/user")
 const organizationModel = require("./src/models/organization")
+const eventModel = require("./src/models/event")
 const db = require("./src/db/db")
 const mongoose = require("mongoose");
 const authCheck = require("./src/middleware/authCheck")
@@ -74,6 +75,12 @@ app.post('/api/login', (req, res) => {
         })
 })
 
+app.post('/api/user', (req, res) => {
+    userModel.newUser(req.body).then(
+        () => res.send("done")
+    ).catch((err) => console.log("Err? " + err))
+})
+
 // Routes requiring auth and using isAuthenticated middleware
 app.use(isAuthenticated)
 app.get('/api/users', (req,res) => {
@@ -82,20 +89,18 @@ app.get('/api/users', (req,res) => {
     ).catch((err) => console.log("Err: " + err))
 })
 
-app.post('/api/user', (req, res) => {
-    userModel.newUser(req.body).then(
-        () => res.send("done")
-    ).catch((err) => console.log("Err? " + err))
-})
-
-
 app.post('/api/organization', (req, res) => {
     organizationModel.newOrganization(req.body).then(
         (data) => res.status(200).json(data)
     ).catch((err) => res.status(500).json({"error": err}))
 })
 
-// TODO: test
+app.post('/api/event', (req, res) => {
+    eventModel.newEvent(req.body).then(
+        (result) => res.json(result)
+    ).catch((err) => res.status(500).json({"error": err}))
+})
+
 app.route('/api/user/:id')
     .get((req, res) => {
     userModel.getUser(req.params.id).then(
@@ -132,6 +137,23 @@ app.route('/api/organization/:id')
         ).catch((err) => res.status(500).json({"error": err}))
     })
 
+app.route('/api/event/:id   ')
+    .get((req, res) => {
+        eventModel.getEvent(req.params.id).then(
+            (data) => res.status(200).json(data)
+        ).catch((err) => res.status(500).json({"error": err}))
+    })
+    .put((req, res) => {
+        // TODO: returns old model data instead of updated (but STILL UPDATES)
+        eventModel.updateEvent(req.params.id, req.body).then(
+            (data) => res.status(200).json(data)
+        ).catch((err) => res.status(500).json({"error": err}))
+    })
+    .delete((req, res) => {
+        eventModel.deleteEvent(req.params.id).then(
+            (data) => res.status(200).json({"message": "Organization deleted", "info": data})
+        ).catch((err) => res.status(500).json({"error": err}))
+    })
 
 mongoose.connection.once("open", () => {
     console.log("Connected to MongoDB")
