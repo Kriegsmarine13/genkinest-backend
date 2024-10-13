@@ -9,7 +9,9 @@ const eventModel = require("./src/models/event")
 const db = require("./src/db/db")
 const mongoose = require("mongoose");
 const authCheck = require("./src/middleware/authCheck")
+const { User } = require("./src/middleware/user")
 const cors = require("cors")
+const eventService = require("./src/services/eventService")
 
 const http = require("http")
 const { Server } = require("socket.io")
@@ -60,11 +62,13 @@ const isAuthenticated = async (req,res,next) => {
     next();
 }
 
+let userData
 app.post('/api/login', (req, res) => {
     let data = req.body
     data.fingerprint = process.env.NB_FINGERPRINT
         axios.post(process.env.NB_AUTH_SERVICE_URL + "/login", data)
             .then((response) => {
+                userData = new User(response.data.userId)
                 // console.log(response.headers)
                 res.set(response.headers)
 
@@ -79,6 +83,29 @@ app.post('/api/user', (req, res) => {
     userModel.newUser(req.body).then(
         () => res.send("done")
     ).catch((err) => console.log("Err? " + err))
+})
+
+app.post('/api/check-token', (req, res) => {
+     axios.post(process.env.NB_AUTH_SERVICE_URL + "/check-token", {
+         "token": req.body.data.accessToken,
+         "fingerprint": process.env.NB_FINGERPRINT,
+         "target": "/"
+     })
+        .then((response) => {
+            res.status(response.status).json(response.data);
+        })
+        .catch((err) => res.status(500).json({"error": err,"message":"error checking token"}))
+})
+
+app.post('/api/refresh-access-token', (req, res) => {
+    axios.post(process.env.NB_AUTH_SERVICE_URL + "/refresh-access-token", {
+        "fingerprint": process.env.NB_FINGERPRINT,
+        "refreshToken": req.body.data.refreshToken
+    })
+        .then((response) => {
+            res.status(200).json({"accessToken":response.data.accessToken})
+        })
+        .catch((err) => res.status(500).json({"error": err, "message": "error refreshing access token"}))
 })
 
 // Routes requiring auth and using isAuthenticated middleware
@@ -96,8 +123,36 @@ app.post('/api/organization', (req, res) => {
 })
 
 app.post('/api/event', (req, res) => {
+    req.body.createdBy = userData.userId
     eventModel.newEvent(req.body).then(
         (result) => res.json(result)
+    ).catch((err) => res.status(500).json({"error": err}))
+})
+
+app.route('/api/event/:id')
+    .get((req, res) => {
+        eventModel.getEvent(req.params.id).then(
+            (result) => res.json(result)
+        ).catch((err) => res.status(500).json({"error": err}))
+    })
+    .put((req, res) => {
+        eventModel.updateEvent(req.params.id, req.body).then(
+            (data) => res.status(200).json(data)
+        ).catch((err) => res.status(500).json({"error": err}))
+    })
+    .delete((req, res) => {
+        eventModel.deleteEvent(req.params.id).then(
+            (data) => res.status(200).json(data)
+        ).catch((err) => res.status(500).json({"error": err}))
+    })
+app.post('/api/event/:id/invite', (req, res) => {
+    eventService.inviteUsers(req.params.id, req.body.users).then(
+        (data) => res.status(200).json(data)
+    ).catch((err) => res.status(500).json({"error": err}))
+})
+app.get('/api/events', (req, res) => {
+    eventModel.getEventsForUser(userData.userId).then(
+        (data) => res.status(200).json(data)
     ).catch((err) => res.status(500).json({"error": err}))
 })
 

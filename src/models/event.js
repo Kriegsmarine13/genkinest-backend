@@ -12,7 +12,7 @@ async function getEvent(eventId) {
 }
 
 async function updateEvent(eventId, data) {
-    return Event.findByIdAndUpdate(eventId, data).exec()
+    return Event.findByIdAndUpdate(eventId, data, {new:true}).exec()
 }
 
 async function deleteEvent(eventId) {
@@ -24,15 +24,19 @@ async function getEvents() {
 }
 
 async function getEventsForUser(userId) {
-    return Event.find({
-        participants: {
-            $in: userId
-        }
-    }).or(
+    return Event.find().or([
+        {
+            participants:
+                {
+                    $in: [userId]
+                }
+        },
         {
             createdBy: userId
         }
-    )
+    ])
 }
+
+
 
 module.exports = { newEvent, getEvent, updateEvent, deleteEvent, getEvents, getEventsForUser }

@@ -1,4 +1,6 @@
 const axios = require("axios")
+const user = require("./user")
+const {User} = require("./user");
 
 async function isAuthenticated(accessToken, refreshToken) {
     // console.log("middleware activated")
@@ -11,7 +13,10 @@ async function isAuthenticated(accessToken, refreshToken) {
     }
     return await axios.post(process.env.NB_AUTH_SERVICE_URL + "/check-token", data)
         .then((response) => {
-            // console.log("accessToken used")
+            console.log("accessToken used")
+            const user = new User(response.data.userId)
+
+            // user.setUserId(response.data.userId)
 
             return true;
         }).catch(async (err) => {
