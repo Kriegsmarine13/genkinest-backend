@@ -18,7 +18,7 @@ async function getUser(userId) {
 }
 
 async function updateUser(userId, data) {
-    return User.findByIdAndUpdate(userId, data).exec();
+    return User.findByIdAndUpdate(userId, data, {new:true}).exec();
 }
 
 async function deleteUser(userId) {

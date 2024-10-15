@@ -12,7 +12,7 @@ async function getOrganization(OrganizationId) {
 }
 
 async function updateOrganization(OrganizationId, data) {
-    return Organization.findByIdAndUpdate(OrganizationId, data).exec();
+    return Organization.findByIdAndUpdate(OrganizationId, data, {new:true}).exec();
 }
 
 async function deleteOrganization(OrganizationId) {

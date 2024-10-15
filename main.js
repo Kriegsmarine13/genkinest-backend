@@ -81,7 +81,7 @@ app.post('/api/login', (req, res) => {
 
 app.post('/api/user', (req, res) => {
     userModel.newUser(req.body).then(
-        () => res.send("done")
+        (response) => res.status(200).json(response)
     ).catch((err) => console.log("Err? " + err))
 })
 
