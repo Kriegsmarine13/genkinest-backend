@@ -12,6 +12,37 @@ const authCheck = require("./src/middleware/authCheck")
 const { User } = require("./src/middleware/user")
 const cors = require("cors")
 const eventService = require("./src/services/eventService")
+const galleryService = require("./src/services/galleryService")
+const galleryModel = require("./src/models/gallery")
+const multer = require('multer');
+const { randomBytes } = require("node:crypto")
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, __dirname + "/public/uploads")
+    },
+    filename: function (req, file, cb) {
+        let ext;
+        switch(file.mimetype) {
+            case 'image/png':
+                ext = ".png"
+                break;
+            case 'image/jpg':
+                ext = ".jpeg"
+                break;
+            case 'image/jpeg':
+                ext = ".jpeg"
+                break;
+            case 'image/svg':
+                ext = ".svg"
+                break;
+
+            default:
+                break;
+        }
+        cb(null, randomBytes(16).toString("hex") + ext)
+    }
+})
+const upload = multer({storage: storage});
 
 const http = require("http")
 const { Server } = require("socket.io")
@@ -30,6 +61,12 @@ app.get('/', (req, res) => {
 app.get('/health', (req, res) => {
     res.status(200).send('OK');
 });
+
+app.get('/api/user/check/:id', (req, res) => {
+    userModel.getUser(req.params.id).then((user) => {
+        res.status(200).send(Object.keys(user).length >= 1);
+    }).catch((err) => res.status(500).send(err))
+})
 
 // <- GIGA IMPORTANT ->
 app.get('/_ah/start', (req, res) => {
@@ -192,7 +229,7 @@ app.route('/api/organization/:id')
         ).catch((err) => res.status(500).json({"error": err}))
     })
 
-app.route('/api/event/:id   ')
+app.route('/api/event/:id')
     .get((req, res) => {
         eventModel.getEvent(req.params.id).then(
             (data) => res.status(200).json(data)
@@ -209,6 +246,34 @@ app.route('/api/event/:id   ')
             (data) => res.status(200).json({"message": "Organization deleted", "info": data})
         ).catch((err) => res.status(500).json({"error": err}))
     })
+
+app.route('/api/gallery/:id')
+    .get((req, res) => {
+        galleryModel.getImage(req.params.id).then(
+            (data) => res.status(200).json(data)
+        ).catch((err) => res.status(500).json({"error": err}))
+    })
+    .delete((req, res) => {
+        galleryModel.deleteImage(req.params.id).then(
+            (data) => res.status(200).json(data)
+        ).catch((err) => res.status(500).json({"error": err}))
+    })
+app.get('/api/gallery', (req, res) => {
+    galleryService.getUserImages(userData.userId).then(
+        (data) => res.status(200).json(data)
+    ).catch((err) => res.status(500).json({"error": err}))
+})
+
+app.post('/api/gallery/', upload.fields([{name: "file", maxCount: 1},{name: "files", maxCount: 10}]),(req, res) => {
+    // console.log(req.files.file)
+    let data = {
+        files: req.files,
+        ownerId: userData.userId,
+    }
+    galleryService.handleFiles(data).then(
+        (data) => res.status(200).json({"message": "Files successfully uploaded!", "data": data})
+    ).catch((err) => res.status(500).json({"error": err}))
+})
 
 mongoose.connection.once("open", () => {
     console.log("Connected to MongoDB")
