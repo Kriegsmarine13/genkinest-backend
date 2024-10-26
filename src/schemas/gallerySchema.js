@@ -10,6 +10,7 @@ const gallerySchema = new Schema({
     createdAt: Date,
     updatedBy: String,
     organizationId: String,
+    tags: Array,
 })
 
 module.exports = { gallerySchema }
