@@ -88,4 +88,4 @@ async function getFamilyImages(userId) {
     return galleryModel.getOrganizationImages(organizationId[0]._id);
 }
 
-module.exports = { handleFiles, getUserImages, uploadMultipleFiles, createImagesFromUrlArray, getFamilyImages };
+module.exports = { getUserImages, uploadMultipleFiles, createImagesFromUrlArray, getFamilyImages };
