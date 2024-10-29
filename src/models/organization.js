@@ -23,4 +23,12 @@ async function getOrganizations() {
     return Organization.find().exec();
 }
 
-module.exports = { newOrganization, getOrganization, updateOrganization, deleteOrganization, getOrganizations }
+async function getUserOrganization(userId) {
+    return Organization.find({
+        users: {
+            $in: [userId]
+        }
+    })
+}
+
+module.exports = { newOrganization, getOrganization, updateOrganization, deleteOrganization, getOrganizations, getUserOrganization }

@@ -63,8 +63,9 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/api/user/check/:id', (req, res) => {
-    userModel.getUser(req.params.id).then((user) => {
-        res.status(200).send(Object.keys(user).length >= 1);
+    organizationModel.getUserOrganization(req.params.id).then((organization) => {
+        // console.log(organization[0]._id)
+        res.status(200).send(organization[0]._id);
     }).catch((err) => res.status(500).send(err))
 })
 
