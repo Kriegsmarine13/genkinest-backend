@@ -3,7 +3,7 @@ const userModel = require('../models/user');
 const organizationModel = require('../models/organization')
 const { Storage } = require('@google-cloud/storage');
 const { join, sep } = require("path");
-const keyfilename = "/tmp/bionic-flux-436408-e2-aa3dda0193df.json";
+const keyfilename = "/tmp/bionic-flux-436408-e2-797f2655a655.json";
 const projectId = "bionic-flux-436408-e2";
 console.log(`${process.env.PRIVATE_KEY_1 + process.env.PRIVATE_KEY_2 + process.env.PRIVATE_KEY_3 + process.env.PRIVATE_KEY_4}`.replace(/\\n/g,"\n"))
 // const storage = new Storage({
@@ -23,21 +23,6 @@ console.log(`${process.env.PRIVATE_KEY_1 + process.env.PRIVATE_KEY_2 + process.e
 //       }})
 const storage = new Storage({projectId, keyfilename})
 const { v4: uuidv4 } = require('uuid');
-
-async function handleFiles(data) {
-    if(Object.hasOwn(data.files, "file")) {
-        // console.log("single file");
-        // console.log(typeof data.files.file[0].buffer);
-        data.filename = uuidv4();
-        console.log(data);
-        data.url = await handleFilesCloud(data.files.file[0].buffer, data.filename, data.files.file[0].mimetype)
-
-        return galleryModel.newImage(data)
-    }
-    // console.log("multiple files")
-
-    return uploadMultipleFiles(data.files.files);
-}
 
 async function uploadFileToGCS(file) {
     // console.log("uploadFileToGCS");
