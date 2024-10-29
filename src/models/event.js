@@ -34,7 +34,7 @@ async function getEventsForUser(userId) {
         {
             createdBy: userId
         }
-    ])
+    ]).exec()
 }
 
 

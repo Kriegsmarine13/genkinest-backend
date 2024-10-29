@@ -4,8 +4,10 @@ const axios = require("axios")
 const app = express()
 const port = process.env.PORT || 8080
 const userModel = require("./src/models/user")
-const organizationModel = require("./src/models/organization")
+const galleryModel = require("./src/models/gallery")
 const eventModel = require("./src/models/event")
+const organizationModel = require("./src/models/organization")
+const taskModel = require("./src/models/task")
 const db = require("./src/db/db")
 const mongoose = require("mongoose");
 const authCheck = require("./src/middleware/authCheck")
@@ -13,7 +15,6 @@ const { User } = require("./src/middleware/user")
 const cors = require("cors")
 const eventService = require("./src/services/eventService")
 const galleryService = require("./src/services/galleryService")
-const galleryModel = require("./src/models/gallery")
 const multer = require('multer');
 const { randomBytes } = require("node:crypto")
 const diskStorage = multer.diskStorage({
@@ -255,7 +256,6 @@ app.route('/api/event/:id')
         ).catch((err) => res.status(500).json({"error": err}))
     })
     .put((req, res) => {
-        // TODO: returns old model data instead of updated (but STILL UPDATES)
         eventModel.updateEvent(req.params.id, req.body).then(
             (data) => res.status(200).json(data)
         ).catch((err) => res.status(500).json({"error": err}))
@@ -303,6 +303,35 @@ app.post('/api/gallery/', upload.fields([{name: "files", maxCount: 10}]),(req, r
         .then((response) => res.status(200).json({"message": "Files successfully uploaded and saved", "data": response}))
         // (data) => res.status(200).json({"message": "Files successfully uploaded!", "data": data})
     ).catch((err) => res.status(500).json({"error": err}))
+})
+
+app.post('/api/task', (req, res) => {
+    taskModel.newTask(req.body).then(
+        (data) => res.status(200).json(data)
+    ).catch((err) => res.status(500).send(err))
+})
+
+app.route('/api/task/:id')
+    .get((req, res) => {
+        taskModel.getTask(req.params.id)
+        .then((data) => res.status(200).json(data))
+        .catch((err) => res.status(500).send(err))
+    })
+    .put((req, res) => {
+        taskModel.updateTask(req.params.id, req.body)
+        .then((data) => res.status(200).json(data))
+        .catch((err) => res.status(500).send(err))
+    })
+    .delete((req, res) => {
+        taskModel.deleteTask(req.params.id)
+        .then((data) => res.status(200).json(data))
+        .catch((err) => res.status(500).send(err))
+    })
+
+app.get('/api/tasks', (req, res) => {
+    taskModel.findRelatedTasks(userData.id)
+    .then((data) => res.status(200).json(data))
+    .catch((err) => res.status(500).json(err))
 })
 
 mongoose.connection.once("open", () => {
