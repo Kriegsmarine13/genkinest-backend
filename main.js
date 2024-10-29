@@ -206,7 +206,7 @@ app.post('/api/organization', (req, res) => {
 })
 
 app.post('/api/event', (req, res) => {
-    req.body.createdBy = userData.id
+    req.body.createdBy = req.headers.userid
     eventModel.newEvent(req.body).then(
         (result) => res.json(result)
     ).catch((err) => res.status(500).json({"error": err}))
@@ -234,7 +234,7 @@ app.post('/api/event/:id/invite', (req, res) => {
     ).catch((err) => res.status(500).json({"error": err}))
 })
 app.get('/api/events', (req, res) => {
-    eventModel.getEventsForUser(userData.id).then(
+    eventModel.getEventsForUser(req.headers.userid).then(
         (data) => res.status(200).json(data)
     ).catch((err) => res.status(500).json({"error": err}))
 })
@@ -354,7 +354,7 @@ app.route('/api/task/:id')
     })
 
 app.get('/api/tasks', (req, res) => {
-    taskModel.findRelatedTasks(userData.id)
+    taskModel.findRelatedTasks(req.headers.userid)
     .then((data) => res.status(200).json(data))
     .catch((err) => res.status(500).json(err))
 })
