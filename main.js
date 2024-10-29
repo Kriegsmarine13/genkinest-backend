@@ -16,6 +16,8 @@ const cors = require("cors")
 const eventService = require("./src/services/eventService")
 const galleryService = require("./src/services/galleryService")
 const multer = require('multer');
+const downloadConfig = require("./src/helpers/downloadGoogleConfig")
+downloadConfig.downloadFile();
 const { randomBytes } = require("node:crypto")
 const diskStorage = multer.diskStorage({
     destination: function (req, file, cb) {
