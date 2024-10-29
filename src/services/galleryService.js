@@ -5,13 +5,14 @@ const { Storage } = require('@google-cloud/storage');
 const { join, sep } = require("path");
 // const keyfilename = "./bionic-flux-436408-e2-aa3dda0193df.json";
 const projectId = "bionic-flux-436408-e2";
+console.log(join(process.env.PRIVATE_KEY_1 + process.env.PRIVATE_KEY_2 + process.env.PRIVATE_KEY_3 + process.env.PRIVATE_KEY_4).replace(/\\n/g,"\n"))
 const storage = new Storage({
     projectId: projectId, 
     credentials:{
         "type": process.env.TYPE,
         "project_id": process.env.PROJECT_ID,
         "private_key_id": process.env.PRIVATE_KEY_ID,
-        "private_key": process.env.PRIVATE_KEY,
+        "private_key": join(process.env.PRIVATE_KEY_1 + process.env.PRIVATE_KEY_2 + process.env.PRIVATE_KEY_3 + process.env.PRIVATE_KEY_4).replace(/\\n/g,"\n"),
         "client_email": process.env.CLIENT_EMAIL,
         "client_id": process.env.CLIENT_ID,
         "auth_uri": process.env.AUTH_URI,
