@@ -47,7 +47,7 @@ const diskStorage = multer.diskStorage({
 const memoryStorage = multer.memoryStorage();
 const upload = multer({storage: memoryStorage});
 const nodeCache = require("node-cache");
-const myCache = new nodeCache({stdTTL: 60 * 60 * 60});
+const myCache = new nodeCache({stdTTL: 60 * 15});
 
 const http = require("http")
 const { Server } = require("socket.io")
@@ -118,19 +118,31 @@ let userData
 app.post('/api/login', (req, res) => {
     let data = req.body
     data.fingerprint = process.env.NB_FINGERPRINT
+    // let hrTime = process.hrtime()
+    let startTime = process.hrtime.bigint()
+    console.log("Time before post to auth service: " + startTime)
         axios.post(process.env.NB_AUTH_SERVICE_URL + "/login", data)
             .then((response) => {
+                console.log("[SUPPOSINGLY] Time after resolving data from auth service: " + (process.hrtime.bigint() - startTime))
                 if(myCache.has(response.data.userId)) {
+                    console.log("Time to check for cache: " + (process.hrtime.bigint() - startTime))
                     userData = myCache.get(response.data.userId);
+                    console.log("Time to get cache: " + (process.hrtime.bigint() - startTime))
                     // console.log("cahched data used")
                     // console.log(userData)
                 }
                 if(userData == undefined) {
                     userModel.getUser(response.data.userId)
                         .then((res) => {
+                            let resolveUserTime = process.hrtime.bigint()
+                            console.log()
                             userData = res;
-                            console.log(userData);
+                            // console.log(userData);
+                            let getUserTime = process.hrtime.bigint();
+                            console.log("Time to get User from database: " + (getUserTime - startTime))
                             myCache.set(response.data.userId, userData);
+                            let setCacheTime = process.hrtime.bigint();
+                            console.log("Time to set cache for User: " + (setCacheTime - startTime))
                         });
                     // console.log("data cached! Getting from cache to check...")
                     // console.log(myCache.get(response.data.userId))
@@ -139,6 +151,9 @@ app.post('/api/login', (req, res) => {
                 // userData = new User(response.data.userId)
                 // console.log(response.headers)
                 res.set(response.headers)
+                let beforeSendTime = process.hrtime.bigint();
+                console.log("Time before sending data: " + (beforeSendTime - startTime))
+                console.log("--------------------------------------")
 
                 res.json({"status": "success", "data": response.data})
             }).catch((err) => {
@@ -289,7 +304,7 @@ app.route('/api/gallery/:id')
     })
 
 app.get('/api/gallery', (req, res) => {
-    galleryService.getFamilyImages(userData.id).then(
+    galleryService.getFamilyImages(req.headers.userid).then(
         (data) => res.status(200).json(data)
     ).catch((err) => res.status(500).json({"error": err}))
 })
@@ -302,14 +317,14 @@ app.get('/api/gallery', (req, res) => {
 
 
 app.post('/api/gallery/', upload.fields([{name: "files", maxCount: 10}]),(req, res) => {
-    // console.log(userData)
+    // console.log(req.headers.userid)
     let data = {
         files: req.files,
-        ownerId: userData.id,
+        ownerId: req.headers.userid,
     }
     // console.log(data);
     galleryService.uploadMultipleFiles(data.files.files).then(
-        (data) => galleryService.createImagesFromUrlArray(userData.id, data)
+        (data) => galleryService.createImagesFromUrlArray(req.headers.userid, data)
         .then((response) => res.status(200).json({"message": "Files successfully uploaded and saved", "data": response}))
         // (data) => res.status(200).json({"message": "Files successfully uploaded!", "data": data})
     ).catch((err) => res.status(500).json({"error": err}))

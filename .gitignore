@@ -3,3 +3,6 @@ node_modules
 *.iml
 .env
 .DS_Store
+*.log
+processed.txt
+src/services/*.json
