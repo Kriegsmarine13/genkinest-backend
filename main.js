@@ -16,7 +16,7 @@ const galleryService = require("./src/services/galleryService")
 const galleryModel = require("./src/models/gallery")
 const multer = require('multer');
 const { randomBytes } = require("node:crypto")
-const storage = multer.diskStorage({
+const diskStorage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, __dirname + "/public/uploads")
     },
@@ -42,7 +42,10 @@ const storage = multer.diskStorage({
         cb(null, randomBytes(16).toString("hex") + ext)
     }
 })
-const upload = multer({storage: storage});
+const memoryStorage = multer.memoryStorage();
+const upload = multer({storage: memoryStorage});
+const nodeCache = require("node-cache");
+const myCache = new nodeCache({stdTTL: 60 * 60 * 60});
 
 const http = require("http")
 const { Server } = require("socket.io")
@@ -106,7 +109,23 @@ app.post('/api/login', (req, res) => {
     data.fingerprint = process.env.NB_FINGERPRINT
         axios.post(process.env.NB_AUTH_SERVICE_URL + "/login", data)
             .then((response) => {
-                userData = new User(response.data.userId)
+                if(myCache.has(response.data.userId)) {
+                    userData = myCache.get(response.data.userId);
+                    // console.log("cahched data used")
+                    // console.log(userData)
+                }
+                if(userData == undefined) {
+                    userModel.getUser(response.data.userId)
+                        .then((res) => {
+                            userData = res;
+                            console.log(userData);
+                            myCache.set(response.data.userId, userData);
+                        });
+                    // console.log("data cached! Getting from cache to check...")
+                    // console.log(myCache.get(response.data.userId))
+                }
+
+                // userData = new User(response.data.userId)
                 // console.log(response.headers)
                 res.set(response.headers)
 
@@ -161,7 +180,7 @@ app.post('/api/organization', (req, res) => {
 })
 
 app.post('/api/event', (req, res) => {
-    req.body.createdBy = userData.userId
+    req.body.createdBy = userData.id
     eventModel.newEvent(req.body).then(
         (result) => res.json(result)
     ).catch((err) => res.status(500).json({"error": err}))
@@ -189,7 +208,7 @@ app.post('/api/event/:id/invite', (req, res) => {
     ).catch((err) => res.status(500).json({"error": err}))
 })
 app.get('/api/events', (req, res) => {
-    eventModel.getEventsForUser(userData.userId).then(
+    eventModel.getEventsForUser(userData.id).then(
         (data) => res.status(200).json(data)
     ).catch((err) => res.status(500).json({"error": err}))
 })
@@ -219,7 +238,6 @@ app.route('/api/organization/:id')
         ).catch((err) => res.status(500).json({"error": err}))
     })
     .put((req, res) => {
-        // TODO: returns old model data instead of updated (but STILL UPDATES)
         organizationModel.updateOrganization(req.params.id, req.body).then(
             (data) => res.status(200).json(data)
         ).catch((err) => res.status(500).json({"error": err}))
@@ -259,20 +277,31 @@ app.route('/api/gallery/:id')
             (data) => res.status(200).json(data)
         ).catch((err) => res.status(500).json({"error": err}))
     })
+
 app.get('/api/gallery', (req, res) => {
-    galleryService.getUserImages(userData.userId).then(
+    galleryService.getFamilyImages(userData.id).then(
         (data) => res.status(200).json(data)
     ).catch((err) => res.status(500).json({"error": err}))
 })
 
-app.post('/api/gallery/', upload.fields([{name: "file", maxCount: 1},{name: "files", maxCount: 10}]),(req, res) => {
-    // console.log(req.files.file)
+// app.get('/api/gallery', (req, res) => {
+//     galleryService.getUserImages(userData.id).then(
+//         (data) => res.status(200).json(data)
+//     ).catch((err) => res.status(500).json({"error": err}))
+// })
+
+
+app.post('/api/gallery/', upload.fields([{name: "files", maxCount: 10}]),(req, res) => {
+    // console.log(userData)
     let data = {
         files: req.files,
-        ownerId: userData.userId,
+        ownerId: userData.id,
     }
-    galleryService.handleFiles(data).then(
-        (data) => res.status(200).json({"message": "Files successfully uploaded!", "data": data})
+    // console.log(data);
+    galleryService.uploadMultipleFiles(data.files.files).then(
+        (data) => galleryService.createImagesFromUrlArray(userData.id, data)
+        .then((response) => res.status(200).json({"message": "Files successfully uploaded and saved", "data": response}))
+        // (data) => res.status(200).json({"message": "Files successfully uploaded!", "data": data})
     ).catch((err) => res.status(500).json({"error": err}))
 })
 

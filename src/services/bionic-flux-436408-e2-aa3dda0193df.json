@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "bionic-flux-436408-e2",
+  "private_key_id": "aa3dda0193dfe5ad5833d29fb1c03d5a55710a41",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDIV0oT6nbk4d5y\nb2NzSw+MCGnhcb49JrsWaUea/LrbxtPLJaOPToNRGTJ8cdi54YwlVIfl9abB+kUK\n1Pre+252o4WlM0Zh0xYPXLvt8Ip+iAOQx0Lf8ai2iQ8dzXYstV6TG54L2Iz1yvpl\nSd3dTQufyvMcC2AQ+Vq7Rc+C/7m/yCkUFqoZmk5hWTHdGJB2jCrHIurfLRzy9fKK\nsQh9Ai+51CqL0JV5GDtQrMtEglm3zfknbdHhcNx99BixqBKqSIeJLIEpHWkHXQjV\nSYlMmbfb0Pmd6/jJGQvQKeZgSrn1GkX27296EEs3NqKRK+35UxX1NwW4FrByeedC\nBtZALN+hAgMBAAECggEAX0sN5F1BQmuhiKMtFdkdQwl5e4/D4oh6sxVOxwzxwLpZ\nYaa8ntzEn52xovnwEbKUG+mSXrKzKE9n6dgWoFvOVkY/uq2iC8QBGTuN9IbXCYqe\nz43IZIcpLfIRq6ZgULHQk36udYoCuqNa6TTygGI2ZkJ90tgiUNCa9LsnEnObIfo1\n2MeE8SAcGKlUcDabWZ9gOMIk20qB9Bq/aWq1cpn5xMvb1QEMhdRQN2PNMluvnltU\nIAFQa4JnHDGKUnvqPG6jLK/fHVJuNNQK9ccAEtla4gyS03WggP7ZqoNCnFEjl50K\nbGpN7Qir073kt4HkNRCGzv6wPTIF+Lej3gCGJs7LVQKBgQD7a3UClalBMfdttCCh\nwftEcjctt8ZgU1kvX120OIlDXM5LlAyEHYX38Tvc4Wso9mXQ+1YLiaJb+lIUmTd8\nI6BCHkqpWYrA1XLgWhGqmiFZOhXJfJDvfGscm9dDil68eP6pyS1TH9EhUcsZ7xcI\nEOGxrCls1ZNgWzPdWD/cXO+ZPwKBgQDL/Z3rik5AFh4Yu77R5zR0tMVkEn1u9JIE\nO8HXotPUZuWoTNRGQPLYzhnRt4NpVmKs52K9o7Sg3ZFj5BfTAZqNP0yrXVgsYIJE\nUoCXKV8iuniOEd0V6I2Oa5NIIo1gtQFWvZTTYDZNxaQYiGe6oT67Q9vg38z93SrA\nvKXWp4lvHwKBgBLEZquWuFehfzK1K2pnrHXjgLLs8OXn0tRybfAx+C0LFGsX1gdW\nnNVxMGLAgNtB6T+8QyQBVhk/ijj3ZujhT+kfkbsqb+0NAdI1ZvQxJSQf7dhob/kw\ndF5iU6M7BO9UqM3LspJt4ZJ3JI3/Bt0XRYGZtE3nc2TR6gEvwTSVy1zJAoGANpBe\nP3S9PZMs9byya/8GHvmDmyL+/kDZFdzOGtnpA3WKlJwIY8pXqvpmGZyWwARlXI5/\n8O3rEORzUV7fqIdTSdjWrzfGsAgYkCHpV4WvduCeApJwqr2Lr77CpJbpbia8dvE6\n79daby8gl5dU96zN1NVv6RS0Bmu0Vd2gFmy17E0CgYBzY/kmNy0ShIX64CJKmcdl\nl7ksDYHc/YmrJPuznuxMpVMBeJSjjs62FtpdiE34PRzyShXWvVKARAEjavzrjoRG\n2mOclcJQWkdldiR4PMue3J8OPSzN/7DNANBMVR9IJf5eDDQaoj4YQuT8cRK7ro2F\nqtHsRet+0vrZcCVzICzyHg==\n-----END PRIVATE KEY-----\n",
+  "client_email": "izumo-app@bionic-flux-436408-e2.iam.gserviceaccount.com",
+  "client_id": "106128263921593240664",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/izumo-app%40bionic-flux-436408-e2.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

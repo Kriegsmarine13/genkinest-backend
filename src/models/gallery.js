@@ -20,7 +20,7 @@ async function getPrivateImages(userId) {
 }
 
 async function getOrganizationImages(organizationId) {
-    return Gallery.find({organizationId: organizationId, isPublic: true}).exec();
+    return Gallery.find({organizationId: organizationId}).exec();
 }
 
 module.exports = { newImage, getImage, deleteImage, getPrivateImages, getOrganizationImages }

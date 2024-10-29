@@ -11,6 +11,7 @@ const gallerySchema = new Schema({
     updatedBy: String,
     organizationId: String,
     tags: Array,
+    url: String,
 })
 
 module.exports = { gallerySchema }
