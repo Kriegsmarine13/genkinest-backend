@@ -17,7 +17,6 @@ const eventService = require("./src/services/eventService")
 const galleryService = require("./src/services/galleryService")
 const multer = require('multer');
 const downloadConfig = require("./src/helpers/downloadGoogleConfig")
-downloadConfig.downloadFile().catch(console.error);
 const { randomBytes } = require("node:crypto")
 const diskStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -84,6 +83,15 @@ app.get('/_ah/start', (req, res) => {
 app.use(express.static("./static"))
 app.get("/test-chat", (req, res) => {
     res.sendFile("./static/index.html", {root: __dirname})
+})
+
+app.get("/download-config", async (req, res) => {
+    try {
+        await downloadConfig.downloadFile().catch(console.error);
+        res.status(200).json({"message": "done!"});
+    } catch(err) {
+        res.status(500).send(err)
+    }
 })
 
 const isAuthenticated = async (req,res,next) => {
