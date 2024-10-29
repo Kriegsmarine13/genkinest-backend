@@ -21,7 +21,7 @@ console.log(`${process.env.PRIVATE_KEY_1 + process.env.PRIVATE_KEY_2 + process.e
 //         "client_x509_cert_url": process.env.CLIENT_X509_CERT_URL,
 //         "universe_domain": process.env.UNIVERSE_DOMAIN
 //       }})
-const storage = new Storage({projectId, keyfilename})
+const storage = new Storage({projectId: projectId, keyFilename: keyfilename})
 const { v4: uuidv4 } = require('uuid');
 
 async function uploadFileToGCS(file) {
