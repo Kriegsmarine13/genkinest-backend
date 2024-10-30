@@ -14,6 +14,7 @@ const authCheck = require("./src/middleware/authCheck")
 const cors = require("cors")
 const eventService = require("./src/services/eventService")
 const galleryService = require("./src/services/galleryService")
+const userService = require("./src/services/userService")
 const multer = require('multer');
 const downloadConfig = require("./src/helpers/downloadGoogleConfig")
 const memoryStorage = multer.memoryStorage();
@@ -113,6 +114,28 @@ app.post('/api/user', (req, res) => {
     
 })
 
+// Test demo route for guest registration 
+app.post('/api/user/demo', (req, res) => {
+    axios.post(process.env.NB_USER_SERVICE_URL + "/users", {
+        name: req.body.name, 
+        password: "test1234", 
+        typeId: "010", 
+        email: (Math.random() + 1).toString(36).substring(7) + "@gmail.com"}
+    )
+    .then(
+        (demoUser) => userService.addUserToFamily("6721f15c3b902e09998d8620", demoUser.data.id)
+        .then(
+            (result) => res.status(200).json({
+                "message": "success", 
+                "data": {
+                    "user": demoUser.data,
+                    "organization": result
+                }
+            })
+        ).catch((orgErr) => console.log("Organization Error: ", orgErr))
+    ).catch((userErr) => console.log("User Error: ", userErr));
+})
+
 app.post('/api/check-token', (req, res) => {
      axios.post(process.env.NB_AUTH_SERVICE_URL + "/check-token", {
          "token": req.body.data.accessToken,
@@ -134,6 +157,12 @@ app.post('/api/refresh-access-token', (req, res) => {
             res.status(200).json({"accessToken":response.data.accessToken})
         })
         .catch((err) => res.status(500).json({"error": err, "message": "error refreshing access token"}))
+})
+
+app.get('/api/events', (req, res) => {
+    eventModel.getEventsForUser(req.headers.userid).then(
+        (data) => res.status(200).json(data)
+    ).catch((err) => res.status(500).json({"error": err}))
 })
 
 // Routes requiring auth and using isAuthenticated middleware
@@ -175,11 +204,6 @@ app.route('/api/event/:id')
     })
 app.post('/api/event/:id/invite', (req, res) => {
     eventService.inviteUsers(req.params.id, req.body.users).then(
-        (data) => res.status(200).json(data)
-    ).catch((err) => res.status(500).json({"error": err}))
-})
-app.get('/api/events', (req, res) => {
-    eventModel.getEventsForUser(req.headers.userid).then(
         (data) => res.status(200).json(data)
     ).catch((err) => res.status(500).json({"error": err}))
 })
