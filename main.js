@@ -136,13 +136,19 @@ app.post('/api/user/demo', (req, res) => {
     .then(
         (demoUser) => userService.addUserToFamily("6721f15c3b902e09998d8620", demoUser.data.id)
         .then(
-            (result) => res.status(200).json({
-                "message": "success", 
-                "data": {
-                    "user": demoUser.data,
-                    "organization": result
-                }
-            })
+            (result) => userModel.getUser(demoUser.data.id)
+            .then(
+                (finalResult) => res.status(200).json({
+                    "message": "success", 
+                    "data": {
+                        "user": finalResult,
+                        "organization": result
+                    }
+                })
+            ).
+            catch(
+                (finalErr) => console.log("Final Error: ", finalErr)
+            )
         ).catch((orgErr) => console.log("Organization Error: ", orgErr))
     ).catch((userErr) => console.log("User Error: ", userErr));
 })
