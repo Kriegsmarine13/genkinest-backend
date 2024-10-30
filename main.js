@@ -119,30 +119,30 @@ app.post('/api/login', (req, res) => {
     let data = req.body
     data.fingerprint = process.env.NB_FINGERPRINT
     // let hrTime = process.hrtime()
-    let startTime = process.hrtime.bigint()
-    console.log("Time before post to auth service: " + startTime)
+    // let startTime = process.hrtime.bigint()
+    // console.log("Time before post to auth service: " + startTime)
         axios.post(process.env.NB_AUTH_SERVICE_URL + "/login", data)
             .then((response) => {
-                console.log("[SUPPOSINGLY] Time after resolving data from auth service: " + (process.hrtime.bigint() - startTime))
+                // console.log("[SUPPOSINGLY] Time after resolving data from auth service: " + (process.hrtime.bigint() - startTime))
                 if(myCache.has(response.data.userId)) {
-                    console.log("Time to check for cache: " + (process.hrtime.bigint() - startTime))
+                    // console.log("Time to check for cache: " + (process.hrtime.bigint() - startTime))
                     userData = myCache.get(response.data.userId);
-                    console.log("Time to get cache: " + (process.hrtime.bigint() - startTime))
+                    // console.log("Time to get cache: " + (process.hrtime.bigint() - startTime))
                     // console.log("cahched data used")
                     // console.log(userData)
                 }
                 if(userData == undefined) {
                     userModel.getUser(response.data.userId)
                         .then((res) => {
-                            let resolveUserTime = process.hrtime.bigint()
-                            console.log()
+                            // let resolveUserTime = process.hrtime.bigint()
+                            // console.log()
                             userData = res;
                             // console.log(userData);
-                            let getUserTime = process.hrtime.bigint();
-                            console.log("Time to get User from database: " + (getUserTime - startTime))
+                            // let getUserTime = process.hrtime.bigint();
+                            // console.log("Time to get User from database: " + (getUserTime - startTime))
                             myCache.set(response.data.userId, userData);
-                            let setCacheTime = process.hrtime.bigint();
-                            console.log("Time to set cache for User: " + (setCacheTime - startTime))
+                            // let setCacheTime = process.hrtime.bigint();
+                            // console.log("Time to set cache for User: " + (setCacheTime - startTime))
                         });
                     // console.log("data cached! Getting from cache to check...")
                     // console.log(myCache.get(response.data.userId))
@@ -151,9 +151,9 @@ app.post('/api/login', (req, res) => {
                 // userData = new User(response.data.userId)
                 // console.log(response.headers)
                 res.set(response.headers)
-                let beforeSendTime = process.hrtime.bigint();
-                console.log("Time before sending data: " + (beforeSendTime - startTime))
-                console.log("--------------------------------------")
+                // let beforeSendTime = process.hrtime.bigint();
+                // console.log("Time before sending data: " + (beforeSendTime - startTime))
+                // console.log("--------------------------------------")
 
                 res.json({"status": "success", "data": response.data})
             }).catch((err) => {
@@ -163,9 +163,13 @@ app.post('/api/login', (req, res) => {
 })
 
 app.post('/api/user', (req, res) => {
-    userModel.newUser(req.body).then(
-        (response) => res.status(200).json(response)
-    ).catch((err) => console.log("Err? " + err))
+    axios.post(process.env.NB_USER_SERVICE_URL + "/users", req.body)
+        .then(
+            (nbResponse) => res.status(200).json(nbResponse.data)
+        ).catch(
+            (err) => console.log(err)
+        )
+    
 })
 
 app.post('/api/check-token', (req, res) => {
