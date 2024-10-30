@@ -16,33 +16,6 @@ const eventService = require("./src/services/eventService")
 const galleryService = require("./src/services/galleryService")
 const multer = require('multer');
 const downloadConfig = require("./src/helpers/downloadGoogleConfig")
-const { randomBytes } = require("node:crypto")
-const diskStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, __dirname + "/public/uploads")
-    },
-    filename: function (req, file, cb) {
-        let ext;
-        switch(file.mimetype) {
-            case 'image/png':
-                ext = ".png"
-                break;
-            case 'image/jpg':
-                ext = ".jpeg"
-                break;
-            case 'image/jpeg':
-                ext = ".jpeg"
-                break;
-            case 'image/svg':
-                ext = ".svg"
-                break;
-
-            default:
-                break;
-        }
-        cb(null, randomBytes(16).toString("hex") + ext)
-    }
-})
 const memoryStorage = multer.memoryStorage();
 const upload = multer({storage: memoryStorage});
 const nodeCache = require("node-cache");
@@ -57,7 +30,7 @@ app.set('trust proxy', true);
 app.use(bodyParser.json())
 app.use(cors())
 
-// DUMB TERRITORY
+// Health checks
 app.get('/', (req, res) => {
     res.status(200).json({"test": 'Hello World!'})
 })
@@ -66,6 +39,7 @@ app.get('/health', (req, res) => {
     res.status(200).send('OK');
 });
 
+// User existence check for chat service
 app.get('/api/user/check/:id', (req, res) => {
     if(!myCache.has("userOrg_" + req.params.id)) {
         organizationModel.getUserOrganization(req.params.id).then((organization) => {
@@ -75,17 +49,12 @@ app.get('/api/user/check/:id', (req, res) => {
     res.status(200).send(myCache.get("userOrg_" + req.params.id))
 })
 
-// <- GIGA IMPORTANT ->
+// Nodeblocks (AppEngine) config required path
 app.get('/_ah/start', (req, res) => {
     res.status(200).json({"hello": "world"});
 })
-// <- GIGA IMPORTANT -/>
 
-// app.use(express.static("./static"))
-// app.get("/test-chat", (req, res) => {
-//     res.sendFile("./static/index.html", {root: __dirname})
-// })
-
+// Workaround for Google Cloud Storage config handling
 app.get("/download-config", async (req, res) => {
     try {
         await downloadConfig.downloadFile().catch(console.error);
@@ -107,7 +76,6 @@ const isAuthenticated = async (req,res,next) => {
     next();
 }
 
-let userData
 app.post('/api/login', (req, res) => {
     let data = req.body
     data.fingerprint = process.env.NB_FINGERPRINT
@@ -334,14 +302,6 @@ mongoose.connection.once("open", () => {
 })
 
 const httpServer = http.createServer(app);
-
-const io = new Server(httpServer, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    },
-    path: '/socket.io/'
-})
 
 httpServer.listen(port, () => {
     console.log(`Example app listening on port ${port}`)

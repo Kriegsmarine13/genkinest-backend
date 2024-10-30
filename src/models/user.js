@@ -12,8 +12,6 @@ async function newUser(data) {
 }
 
 async function getUser(userId) {
-    // console.log(userId)
-    // console.log(await User.findById(userId).exec())
     return User.findById(userId).exec()
 }
 
