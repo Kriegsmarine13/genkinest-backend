@@ -162,10 +162,13 @@ app.post('/api/refresh-access-token', (req, res) => {
         .catch((err) => res.status(500).json({"error": err, "message": "error refreshing access token"}))
 })
 
-app.get('/api/events', (req, res) => {
-    eventModel.getEventsForUser(req.headers.userid).then(
-        (data) => res.status(200).json(data)
-    ).catch((err) => res.status(500).json({"error": err}))
+app.get('/api/organization/events', (req, res) => {
+    eventModel.getEvents(req.headers.organizationid)
+    .then(
+        (events) => res.status(200).json(events)
+    ).catch(
+        (eventErr) => console.log(eventErr)
+    )
 })
 
 // Routes requiring auth and using isAuthenticated middleware
@@ -262,6 +265,12 @@ app.route('/api/event/:id')
             (data) => res.status(200).json({"message": "Organization deleted", "info": data})
         ).catch((err) => res.status(500).json({"error": err}))
     })
+
+app.get('/api/events', (req, res) => {
+    eventModel.getEventsForUser(req.headers.userid).then(
+        (data) => res.status(200).json(data)
+    ).catch((err) => res.status(500).json({"error": err}))
+})
 
 app.route('/api/gallery/:id')
     .get((req, res) => {

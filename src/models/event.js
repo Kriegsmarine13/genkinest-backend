@@ -23,6 +23,10 @@ async function getEvents() {
     return Event.find().exec();
 }
 
+async function getEventsForOrganization(orgnizationId) {
+    return Event.find({organizationId: orgnizationId}).exec();
+}
+
 async function getEventsForUser(userId) {
     return Event.find().or([
         {
