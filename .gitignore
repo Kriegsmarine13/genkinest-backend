@@ -6,3 +6,4 @@ node_modules
 *.log
 processed.txt
 src/services/*.json
+*.txt

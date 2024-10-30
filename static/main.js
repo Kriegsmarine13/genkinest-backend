@@ -11,7 +11,7 @@ let messages = [];
 let isUser = "";
 
 socket.on("message", message => {
-    console.log(message)
+    // console.log(message)
     messages.push(message);
     updateMessages();
 });
