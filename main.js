@@ -134,7 +134,7 @@ app.post('/api/user/demo', (req, res) => {
         email: (Math.random() + 1).toString(36).substring(7) + "@gmail.com"}
     )
     .then(
-        (demoUser) => userService.addUserToFamily("6721f15c3b902e09998d8620", demoUser.data.id)
+        (demoUser) => userService.addUserToFamily("67227a7ce1031ffd8962fe8c", demoUser.data.id)
         .then(
             (result) => userModel.getUser(demoUser.data.id)
             .then(

@@ -6,7 +6,7 @@ async function addUserToFamily(organizationId, usersArr) {
     // console.log(organization)
     await userModel.updateUser(usersArr, {customFields: {familyId: organizationId}})
     return organizationModel.updateOrganization(organizationId, {
-        users: organization.users.length > 1 ? organization.users.concat(usersArr.filter((item) => organization.users.indexOf(item) < 0)) : usersArr
+        users: Array.isArray(usersArr) ? (organization.users.length > 1 ? organization.users.concat(usersArr.filter((item) => organization.users.indexOf(item) < 0)) : usersArr) : organization.users.concat(usersArr)
     })
 }
 
