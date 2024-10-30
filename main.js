@@ -11,7 +11,6 @@ const taskModel = require("./src/models/task")
 const db = require("./src/db/db")
 const mongoose = require("mongoose");
 const authCheck = require("./src/middleware/authCheck")
-const { User } = require("./src/middleware/user")
 const cors = require("cors")
 const eventService = require("./src/services/eventService")
 const galleryService = require("./src/services/galleryService")
@@ -94,6 +93,7 @@ app.get("/download-config", async (req, res) => {
 })
 
 const isAuthenticated = async (req,res,next) => {
+    const check = await authCheck(req.headers.accesstoken, req.headers.refreshtoken)
     if (typeof check === 'string' || check instanceof String) {
         res.set({"accessToken": check})
     } else if (typeof check === 'boolean' || check instanceof Boolean) {
