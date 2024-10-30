@@ -69,7 +69,6 @@ app.get('/health', (req, res) => {
 
 app.get('/api/user/check/:id', (req, res) => {
     organizationModel.getUserOrganization(req.params.id).then((organization) => {
-        // console.log(organization[0]._id)
         res.status(200).send(organization[0]._id);
     }).catch((err) => res.status(500).send(err))
 })
@@ -80,10 +79,10 @@ app.get('/_ah/start', (req, res) => {
 })
 // <- GIGA IMPORTANT -/>
 
-app.use(express.static("./static"))
-app.get("/test-chat", (req, res) => {
-    res.sendFile("./static/index.html", {root: __dirname})
-})
+// app.use(express.static("./static"))
+// app.get("/test-chat", (req, res) => {
+//     res.sendFile("./static/index.html", {root: __dirname})
+// })
 
 app.get("/download-config", async (req, res) => {
     try {
@@ -95,19 +94,10 @@ app.get("/download-config", async (req, res) => {
 })
 
 const isAuthenticated = async (req,res,next) => {
-    // console.log("isAuth fired")
-    // console.log(req.headers)
-    const check = await authCheck(req.headers.accesstoken, req.headers.refreshtoken)
-    // console.log("authCheck done")
-    // console.log(check)
     if (typeof check === 'string' || check instanceof String) {
-        // console.log("check is a string, setting new access token")
-        // console.log(res.headers)
         res.set({"accessToken": check})
     } else if (typeof check === 'boolean' || check instanceof Boolean) {
-        // console.log("check is boolean with value " + check)
         if (!check) {
-            // console.log("check failed, 403")
             res.status(403).send({status: "Unauthenticated", code: 403})
         }
     }
@@ -118,42 +108,9 @@ let userData
 app.post('/api/login', (req, res) => {
     let data = req.body
     data.fingerprint = process.env.NB_FINGERPRINT
-    // let hrTime = process.hrtime()
-    // let startTime = process.hrtime.bigint()
-    // console.log("Time before post to auth service: " + startTime)
         axios.post(process.env.NB_AUTH_SERVICE_URL + "/login", data)
             .then((response) => {
-                // console.log("[SUPPOSINGLY] Time after resolving data from auth service: " + (process.hrtime.bigint() - startTime))
-                if(myCache.has(response.data.userId)) {
-                    // console.log("Time to check for cache: " + (process.hrtime.bigint() - startTime))
-                    userData = myCache.get(response.data.userId);
-                    // console.log("Time to get cache: " + (process.hrtime.bigint() - startTime))
-                    // console.log("cahched data used")
-                    // console.log(userData)
-                }
-                if(userData == undefined) {
-                    userModel.getUser(response.data.userId)
-                        .then((res) => {
-                            // let resolveUserTime = process.hrtime.bigint()
-                            // console.log()
-                            userData = res;
-                            // console.log(userData);
-                            // let getUserTime = process.hrtime.bigint();
-                            // console.log("Time to get User from database: " + (getUserTime - startTime))
-                            myCache.set(response.data.userId, userData);
-                            // let setCacheTime = process.hrtime.bigint();
-                            // console.log("Time to set cache for User: " + (setCacheTime - startTime))
-                        });
-                    // console.log("data cached! Getting from cache to check...")
-                    // console.log(myCache.get(response.data.userId))
-                }
-
-                // userData = new User(response.data.userId)
-                // console.log(response.headers)
                 res.set(response.headers)
-                // let beforeSendTime = process.hrtime.bigint();
-                // console.log("Time before sending data: " + (beforeSendTime - startTime))
-                // console.log("--------------------------------------")
 
                 res.json({"status": "success", "data": response.data})
             }).catch((err) => {
@@ -200,7 +157,7 @@ app.use(isAuthenticated)
 app.get('/api/users', (req,res) => {
     userModel.getUsers().then(
         (result) => res.json(result)
-    ).catch((err) => console.log("Err: " + err))
+    ).catch((err) => res.status(500).json({"error": err}))
 })
 
 app.post('/api/organization', (req, res) => {
@@ -313,24 +270,16 @@ app.get('/api/gallery', (req, res) => {
     ).catch((err) => res.status(500).json({"error": err}))
 })
 
-// app.get('/api/gallery', (req, res) => {
-//     galleryService.getUserImages(userData.id).then(
-//         (data) => res.status(200).json(data)
-//     ).catch((err) => res.status(500).json({"error": err}))
-// })
 
 
 app.post('/api/gallery/', upload.fields([{name: "files", maxCount: 10}]),(req, res) => {
-    // console.log(req.headers.userid)
     let data = {
         files: req.files,
         ownerId: req.headers.userid,
     }
-    // console.log(data);
     galleryService.uploadMultipleFiles(data.files.files).then(
         (data) => galleryService.createImagesFromUrlArray(req.headers.userid, data)
         .then((response) => res.status(200).json({"message": "Files successfully uploaded and saved", "data": response}))
-        // (data) => res.status(200).json({"message": "Files successfully uploaded!", "data": data})
     ).catch((err) => res.status(500).json({"error": err}))
 })
 
