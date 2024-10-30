@@ -46,7 +46,7 @@ const diskStorage = multer.diskStorage({
 const memoryStorage = multer.memoryStorage();
 const upload = multer({storage: memoryStorage});
 const nodeCache = require("node-cache");
-const myCache = new nodeCache({stdTTL: 60 * 15});
+const myCache = new nodeCache({stdTTL: 60 * 60 * 24});
 
 const http = require("http")
 const { Server } = require("socket.io")
@@ -67,9 +67,12 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/api/user/check/:id', (req, res) => {
-    organizationModel.getUserOrganization(req.params.id).then((organization) => {
-        res.status(200).send(organization[0]._id);
-    }).catch((err) => res.status(500).send(err))
+    if(!myCache.has("userOrg_" + req.params.id)) {
+        organizationModel.getUserOrganization(req.params.id).then((organization) => {
+            myCache.set("userOrg_" + req.params.id, organization[0]._id)
+        }).catch((err) => res.status(500).send(err))
+    }
+    res.status(200).send(myCache.get("userOrg_" + req.params.id))
 })
 
 // <- GIGA IMPORTANT ->
@@ -339,36 +342,6 @@ const io = new Server(httpServer, {
     },
     path: '/socket.io/'
 })
-
-const users = []
-// io.on('connection', (socket) => {
-//     console.log("New WebSocket connection ");
-//     socket.on("adduser", username => {
-//         socket.user = username;
-//         users.push(username);
-//         io.sockets.emit("users", users);
-
-//         io.to(socket.id).emit("private", {
-//             id: socket.id,
-//             name: socket.user,
-//             msg: "secret message",
-//         });
-//     });
-
-//     socket.on('message', (message) => {
-//         console.log(`Received message: ${message}`);
-//         io.sockets.emit('message', {
-//             message,
-//             user: socket.user,
-//             id: socket.id,
-//         });
-//     });
-
-//     socket.on('disconnect', () => {
-//         console.log('Client disconnected');
-//     })
-// })
-
 
 httpServer.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
