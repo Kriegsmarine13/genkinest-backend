@@ -378,33 +378,33 @@ const io = new Server(httpServer, {
 })
 
 const users = []
-io.on('connection', (socket) => {
-    console.log("New WebSocket connection ");
-    socket.on("adduser", username => {
-        socket.user = username;
-        users.push(username);
-        io.sockets.emit("users", users);
+// io.on('connection', (socket) => {
+//     console.log("New WebSocket connection ");
+//     socket.on("adduser", username => {
+//         socket.user = username;
+//         users.push(username);
+//         io.sockets.emit("users", users);
 
-        io.to(socket.id).emit("private", {
-            id: socket.id,
-            name: socket.user,
-            msg: "secret message",
-        });
-    });
+//         io.to(socket.id).emit("private", {
+//             id: socket.id,
+//             name: socket.user,
+//             msg: "secret message",
+//         });
+//     });
 
-    socket.on('message', (message) => {
-        console.log(`Received message: ${message}`);
-        io.sockets.emit('message', {
-            message,
-            user: socket.user,
-            id: socket.id,
-        });
-    });
+//     socket.on('message', (message) => {
+//         console.log(`Received message: ${message}`);
+//         io.sockets.emit('message', {
+//             message,
+//             user: socket.user,
+//             id: socket.id,
+//         });
+//     });
 
-    socket.on('disconnect', () => {
-        console.log('Client disconnected');
-    })
-})
+//     socket.on('disconnect', () => {
+//         console.log('Client disconnected');
+//     })
+// })
 
 
 httpServer.listen(port, () => {
