@@ -51,6 +51,7 @@ app.get('/api/user/check/:id', (req, res) => {
 
 // Nodeblocks (AppEngine) config required path
 app.get('/_ah/start', (req, res) => {
+    console.log("/_ah/start endpoint called")
     res.status(200).json({"hello": "world"});
 })
 
