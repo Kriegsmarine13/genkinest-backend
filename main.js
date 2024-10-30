@@ -122,7 +122,21 @@ app.post('/api/login', (req, res) => {
 app.post('/api/user', (req, res) => {
     axios.post(process.env.NB_USER_SERVICE_URL + "/users", req.body)
         .then(
-            (nbResponse) => res.status(200).json(nbResponse.data)
+            (nbResponse) => organizationModel.newOrganization({
+                ownerId: nbResponse.data.id,
+                users: [nbResponse.data.id]
+            })
+            .then(
+                (orgResponse) => res.status(200).json({
+                    "messages": "success", 
+                    "data": {
+                        "user": nbResponse.data,
+                        "organization": orgResponse
+                    }
+                })
+            ).catch(
+                (orgErr) => console.log(orgErr)
+            )
         ).catch(
             (err) => console.log(err)
         )
