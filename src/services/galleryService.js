@@ -3,7 +3,7 @@ const userModel = require('../models/user');
 const organizationModel = require('../models/organization')
 const { Storage } = require('@google-cloud/storage');
 const { join, sep } = require("path");
-const keyfilename = "/tmp/bionic-flux-436408-e2-797f2655a655.json";
+const keyfilename = "./src/services/bionic-flux-436408-e2-797f2655a655.json";
 const projectId = "bionic-flux-436408-e2";
 const storage = new Storage({projectId: projectId, keyFilename: keyfilename})
 

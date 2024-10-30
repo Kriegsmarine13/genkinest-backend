@@ -11,19 +11,8 @@ const eventSchema = new Schema({
     participants: Array,
     confirmedParticipants: Array,
     customFields: Object,
-    notify: Boolean, // needs notification?
-    /*
-    How I see it: [
-        {
-            userId: 1,
-            notificationType: [internal, email],
-            notifyTime: "2024-12-31 15:30",
-            repeat: true,
-            repeatInterval: "15 * 60",
-        }
-    ]
-     */
-    notification: Array, //types of notification: ["internal", "email", "sms"]
+    notify: Boolean,
+    notification: Array,
     description: String,
     start: Date,
     end: Date,

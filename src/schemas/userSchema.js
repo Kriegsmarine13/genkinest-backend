@@ -1,10 +1,8 @@
-// require("../../db/db")
 const mongoose = require("mongoose")
 const { Schema } = mongoose;
 
 
 const userSchema = new Schema({
-    // _id: mongoose.Schema.Types.ObjectId,
     addressLine1: String,
     createdAt: Date,
     delFlg: Number,
