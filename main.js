@@ -50,9 +50,15 @@ app.get('/api/user/check/:id', (req, res) => {
 })
 
 // Nodeblocks (AppEngine) config required path
-app.get('/_ah/start', (req, res) => {
+app.get('/_ah/start', async (req, res) => {
     console.log("/_ah/start endpoint called")
-    res.status(200).json({"hello": "world"});
+    try {
+        await downloadConfig.downloadFile().catch(console.error);
+        res.status(200).json({"message": "done!", "hello": "world"});
+    } catch(err) {
+        res.status(500).send(err)
+    }
+    // res.status(200).json({"hello": "world"});
 })
 
 // Workaround for Google Cloud Storage config handling
