@@ -98,13 +98,16 @@ app.post('/api/user', (req, res) => {
                 users: [nbResponse.data.id]
             })
             .then(
-                (orgResponse) => res.status(200).json({
-                    "messages": "success", 
-                    "data": {
-                        "user": nbResponse.data,
-                        "organization": orgResponse
-                    }
-                })
+                (orgResponse) => userModel.updateUser(nbResponse.data.id, {customFields: {familyId: orgResponse._id}})
+                .then(
+                    (updatedUser) => res.status(200).json({
+                        "message": "success",
+                        "data": {
+                            "user": updatedUser,
+                            "organization": orgResponse
+                        }
+                    })
+                ).catch((updatedUserErr) => console.log(updatedUserErr))
             ).catch(
                 (orgErr) => console.log(orgErr)
             )
