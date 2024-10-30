@@ -22,7 +22,6 @@ const nodeCache = require("node-cache");
 const myCache = new nodeCache({stdTTL: 60 * 60 * 24});
 
 const http = require("http")
-const { Server } = require("socket.io")
 
 db.connect();
 
