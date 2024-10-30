@@ -138,13 +138,20 @@ app.post('/api/user/demo', (req, res) => {
         .then(
             (result) => userModel.getUser(demoUser.data.id)
             .then(
-                (finalResult) => res.status(200).json({
-                    "message": "success", 
-                    "data": {
-                        "user": finalResult,
-                        "organization": result
-                    }
-                })
+                (finalResult) => axios.post(process.env.NB_AUTH_SERVICE_URL + "/login", {email: demoUser.data.email, password: "test1234", fingerprint: process.env.NB_FINGERPRINT})
+                .then(
+                    (response) => res.status(200).json({
+                        "message": "success", 
+                        "data": {
+                            "user": finalResult,
+                            "organization": result,
+                            "accessToken" : response.data.accessToken,
+                            "refreshToken": response.data.refreshToken
+                        }
+                    })
+                ).catch(
+                    (authErr) => console.log("Auth Error: ", authErr)
+                )
             ).
             catch(
                 (finalErr) => console.log("Final Error: ", finalErr)
