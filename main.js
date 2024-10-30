@@ -75,12 +75,13 @@ const isAuthenticated = async (req,res,next) => {
     const check = await authCheck(req.headers.accesstoken, req.headers.refreshtoken)
     if (typeof check === 'string' || check instanceof String) {
         res.set({"accessToken": check})
+        next();
     } else if (typeof check === 'boolean' || check instanceof Boolean) {
         if (!check) {
             res.status(403).send({status: "Unauthenticated", code: 403})
         }
+        next();
     }
-    next();
 }
 
 app.post('/api/login', (req, res) => {
